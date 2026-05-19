@@ -1,0 +1,24 @@
+[Unit]
+Description=AdGuard DNS-over-QUIC Proxy
+After=network-online.target
+Before=pihole-FTL.service
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/dnsproxy \
+  -l 127.0.0.1 -p 5353 \
+  -u quic://9.9.9.9:853 \
+  -u quic://149.112.112.9:853 \
+  -u https://1.1.1.2/dns-query \
+  -u https://1.0.0.2/dns-query \
+  --upstream-mode=parallel \
+  --fallback https://1.1.1.2/dns-query \
+  --pending-requests-enabled \
+  --timeout=5s \
+  -r 500 --cache --cache-optimistic
+Restart=always
+RestartSec=5
+User=root
+
+[Install]
+WantedBy=multi-user.target
