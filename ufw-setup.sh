@@ -2,20 +2,20 @@
 # =============================================================================
 #  UFW SETUP — ProDesk G3 600 | Debian
 #  Autore: generato per ubermensch
-#  Data:   2026-04-02
+#  Data:    2026-04-15 (Aggiornato per dnsproxy DoQ)
 #
 #  Rete locale:  192.168.1.0/24  (IliadBox gateway: 192.168.1.1)
 #  IP server:    192.168.1.118
 #  Tailscale:    100.116.94.86  (range Tailscale: 100.64.0.0/10)
 #
 #  Servizi attivi:
-#    - Pi-hole FTL     (DNS :53, HTTP :80, HTTPS :443)
-#    - DNSCrypt-proxy  (solo loopback :5300 — nessuna regola necessaria)
-#    - SSH             (:22)
-#    - Samba SMB3      (:445 — NetBIOS :139 gia' disabilitato)
-#    - Plex            (:32400)
-#    - Transmission    (web UI :9091, BitTorrent :51413)
-#    - Tailscale       (UDP :41641)
+#    - Pi-hole FTL      (DNS :53, HTTP :80, HTTPS :443)
+#    - dnsproxy (DoQ)   (solo loopback :5353 — interroga Quad9 UDP :853)
+#    - SSH              (:22)
+#    - Samba SMB3       (:445)
+#    - Plex             (:32400)
+#    - Transmission     (web UI :9091, BitTorrent :51413)
+#    - Tailscale        (UDP :41641)
 # =============================================================================
 
 set -euo pipefail
@@ -27,7 +27,7 @@ fi
 
 echo ""
 echo "=========================================="
-echo "  UFW SETUP — ProDesk Debian"
+echo "  UFW SETUP — ProDesk Debian (DoQ Edition)"
 echo "=========================================="
 echo ""
 
@@ -66,6 +66,14 @@ echo "      OK — deny incoming, allow outgoing, deny routed"
 #  STEP 5 — Regole per servizio
 # =============================================================================
 echo "[5/8] Applicazione regole per servizio..."
+
+# LOOPBACK — Fondamentale per Pi-hole <-> dnsproxy
+ufw allow in on lo comment "Consenti traffico interno (DNS loopback)" > /dev/null
+echo "      [OK] Loopback lo (Interno)"
+
+# DNS QUIC OUTGOING — Assicuriamoci che DoQ possa uscire
+ufw allow out 853/udp comment "Allow Quad9 DoQ Outgoing" > /dev/null
+echo "      [OK] DoQ Outgoing UDP 853"
 
 # TAILSCALE — UDP 41641
 ufw allow in on eno1 to any port 41641 proto udp \
@@ -123,7 +131,6 @@ ufw allow in on tailscale0 to any port 9091 proto tcp \
 echo "      [OK] Transmission Web UI TCP 9091 (LAN + Tailscale)"
 
 # TRANSMISSION BitTorrent — TCP+UDP 51413
-# Solo IPv4: la versione IPv6 viene rimossa nello step 7.
 ufw allow in on eno1 to any port 51413 proto tcp \
     comment "Transmission BitTorrent TCP IPv4" > /dev/null
 ufw allow in on eno1 to any port 51413 proto udp \
@@ -139,23 +146,9 @@ echo "      OK — ufw attivo"
 
 # =============================================================================
 #  STEP 7 — Pulizia regole IPv6 ALLOW su eno1 + blocco IPv6 pubblico
-#
-#  ufw duplica ogni regola anche in versione (v6). Su eno1 le versioni
-#  IPv6 ALLOW sono pericolose perche' l'interfaccia ha un IPv6 pubblico
-#  raggiungibile da internet.
-#
-#  Strategia:
-#  1. Rimuoviamo solo le regole (v6) ALLOW su eno1
-#     (escludiamo le DENY per non rimuovere il blocco che stiamo per aggiungere)
-#  2. Aggiungiamo la deny 2000::/3 su eno1
-#
-#  Le regole (v6) su tailscale0 vengono lasciate: usano fd7a::/48 (ULA),
-#  non raggiungibile da internet pubblico.
 # =============================================================================
 echo "[7/8] Pulizia IPv6 ALLOW su eno1 e blocco IPv6 pubblico..."
 
-# Elimina tutte le regole che matchano "(v6)" + "on eno1" + "ALLOW"
-# Ricalcola i numeri dopo ogni delete (scalano verso il basso).
 while true; do
     num=$(ufw status numbered 2>/dev/null \
         | grep -P '\(v6\).*on eno1.*ALLOW IN' \
@@ -166,9 +159,6 @@ while true; do
 done
 echo "      [OK] Regole IPv6 ALLOW su eno1 rimosse"
 
-# Blocco esplicito tutto il traffico IPv6 pubblico in ingresso su eno1.
-# Copre Transmission (2a01:e11:...:51413) e Plex (*:32400) che non
-# permettono di limitare il bind IPv6 via configurazione.
 ufw deny in on eno1 from 2000::/3 to any \
     comment "Blocco IPv6 globale in ingresso su eno1" > /dev/null
 echo "      [OK] Blocco 2000::/3 aggiunto su eno1"
@@ -184,38 +174,8 @@ echo "=========================================="
 ufw status numbered
 echo ""
 echo "=========================================="
-echo "  AZIONI MANUALI RACCOMANDATE"
-echo "=========================================="
-echo ""
-echo "  1. PLEX — configura dall'interfaccia web:"
-echo "     Impostazioni -> Accesso remoto -> Disabilita"
-echo "     Impostazioni -> Rete -> Allowed Networks:"
-echo "       192.168.1.0/24,100.64.0.0/10,fd7a:115c:a1e0::/48"
-echo ""
-echo "  2. SSH — solo autenticazione con chiave:"
-echo "     Modifica /etc/ssh/sshd_config:"
-echo "       PasswordAuthentication no"
-echo "       PermitRootLogin no"
-echo "     sudo systemctl restart ssh"
-echo ""
-echo "  3. Aggiungi liste Pi-hole per tracking nativo produttori:"
-echo "     Pi-hole → Adlists → aggiungi:"
-echo "       https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/adblock/native.apple.txt"
-echo "       https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/adblock/native.samsung.txt"
-echo "       https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/adblock/native.lgwebos.txt"
-echo "       https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/adblock/native.chromecast.txt"
-echo "       https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/adblock/native.winoffice.txt"
-echo ""
-echo "  4. Aggiornamenti automatici di sicurezza:"
-echo "     sudo apt install unattended-upgrades"
-echo "     sudo dpkg-reconfigure unattended-upgrades"
-echo ""
-echo "  5. Audit sistema con Lynis:"
-echo "     sudo apt install lynis && sudo lynis audit system"
-echo ""
-echo "=========================================="
 echo "  VERIFICA RAPIDA"
 echo "=========================================="
-echo "  sudo ss -tlnp"
-echo "  sudo ufw status numbered"
+echo "  sudo journalctl -u dnsproxy -f"
+echo "  drill -t txt proto.quad9.net @127.0.0.1"
 echo ""
