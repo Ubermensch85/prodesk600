@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # =============================================================================
 #  dns-sentinel.sh — Automa di monitoraggio, auto-healing e aggiornamenti
-#  Catena: Pi-hole v6 -> dnsproxy (DoQ/DoH3) -> Tailscale Exit/Subnet Router
+#  Catena: Debian 13 -> Pi-hole v6 -> dnsproxy (DoQ/DoH3) -> Tailscale
 #  Host: HP ProDesk 600 (Debian 13) | ISP: Iliad FTTH EPON 5/900 (Perugia)
 # =============================================================================
 
@@ -34,6 +34,11 @@ check_updates() {
 
   # tailscale
   INSTALLED_TAILSCALE=$(tailscale version 2>/dev/null | head -n1)
+
+  # debian packages
+  DEBIAN_UPDATES=$(apt-get -s upgrade 2>/dev/null | grep -oP '^\d+(?=\s+aggiornati)' || echo "0")
+  REBOOT_REQUIRED=0
+  [[ -f /var/run/reboot-required ]] && REBOOT_REQUIRED=1
 }
 
 # 2. Benchmark di rete Iliadbox & Resolver Anycast
@@ -91,24 +96,33 @@ ${WARNS}
 
 elif [[ "$ACTION" == "--report" ]] || [[ $(date +%u) -eq 7 && $(date +%H) -eq 20 ]]; then
   # Digest programmato (Domenica ore 20 o manuale)
-  UPDATE_MSG="Tutti i componenti sono aggiornati."
+  UPDATE_MSG="Tutti i componenti software e Debian sono aggiornati."
   if [[ -n "$LATEST_DNSPROXY" && "$LATEST_DNSPROXY" != "$INSTALLED_DNSPROXY" ]]; then
     UPDATE_MSG="Nuova versione dnsproxy disponibile: ${LATEST_DNSPROXY} (installata: ${INSTALLED_DNSPROXY})"
   elif [[ $PIHOLE_UPDATE -eq 1 ]]; then
     UPDATE_MSG="Nuovo aggiornamento Pi-hole disponibile (eseguire pihole -up)"
+  elif [[ "${DEBIAN_UPDATES}" -gt 0 ]]; then
+    UPDATE_MSG="${DEBIAN_UPDATES} aggiornamenti Debian in elaborazione automatica."
   fi
 
-  MSG="🛡️ DNS Sentinel Status Report — ${DATE}
+  REBOOT_MSG=""
+  if [[ $REBOOT_REQUIRED -eq 1 ]]; then
+    REBOOT_MSG="⚠️ Riavvio server richiesto per aggiornamento kernel (programmato per le 04:30)."
+  fi
+
+  MSG="🛡️ ProDesk Sentinel Status Report — ${DATE}
 📍 Perugia | Iliad FTTH EPON 5/900
 ⚡ Latenza Iliadbox: ${PING_ROUTER:-0.3} ms
 🌐 Quad9 DoQ (853): ${PING_QUAD9:-13} ms | Cloudflare (DoH): ${PING_CF:-14} ms
 
-📦 Versioni Software:
+📦 Stato Software & Sistema:
+• Debian 13: ${DEBIAN_UPDATES:-0} aggiornamenti pendenti (unattended-upgrades attivo)
 • Pi-hole: v6 (FTL v6.8, Core v6.5, Web v6.6.1)
 • dnsproxy: ${INSTALLED_DNSPROXY:-v0.86.0} (DoQ/DoH3 in parallel)
 • Tailscale: ${INSTALLED_TAILSCALE:-1.104.2} (Subnet Router/Exit Node)
 
 ${UPDATE_MSG}
+${REBOOT_MSG}
 ✔ Stato catena: 100% OPERATIVO, 0 errori."
   send_telegram "$MSG"
 
