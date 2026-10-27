@@ -1,0 +1,11 @@
+# Git ignore per backup prodesk600
+*.log
+*.tmp
+*.bak
+*.old
+*.tar.gz
+.DS_Store
+__pycache__/
+*.pyc
+.env
+.env.local

@@ -1,0 +1,58 @@
+# AdGuard dnsproxy configuration
+# Optimized for LAN & Tailscale: Pi-hole -> dnsproxy (DoQ/DoH3) -> Multi-provider Upstream
+
+listen-addrs:
+  - 127.0.0.1
+  - ::1
+listen-ports:
+  - 5353
+
+# Upstream query mode: parallel queries all upstreams concurrently and returns fastest response
+upstream-mode: parallel
+
+# Outbound query timeout (3s avoids false timeouts during idle QUIC renegotiation)
+timeout: 3s
+
+# Enable HTTP/3 support for DoH
+http3: true
+
+# In-memory caching with optimistic TTL refresh
+cache: true
+cache-size: 16777216
+cache-optimistic: true
+optimistic-answer-ttl: 60s
+optimistic-max-age: 24h
+
+# Security & RFC hardening
+pending-requests-enabled: true
+refuse-any: true
+dnssec: true
+tls-min-version: 1.3
+udp-buf-size: 8388608
+ratelimit: 1000
+
+# Explicit bootstrap resolvers (independent of local 127.0.0.1)
+bootstrap:
+  - 9.9.9.9
+  - 149.112.112.9
+  - 1.1.1.2
+  - 1.0.0.2
+
+# Upstream Resolvers (Dual-provider: Quad9 DoQ + Cloudflare 1.1.1.2 Security DoH3)
+upstream:
+  - quic://9.9.9.9:853
+  - quic://149.112.112.9:853
+  - quic://[2620:fe::fe]:853
+  - quic://[2620:fe::9]:853
+  - https://1.1.1.2/dns-query
+  - https://1.0.0.2/dns-query
+  - https://[2606:4700:4700::1112]/dns-query
+  - https://[2606:4700:4700::1002]/dns-query
+
+# Emergency Fallback Resolvers
+fallback:
+  - https://9.9.9.9/dns-query
+  - https://149.112.112.9/dns-query
+  - https://[2620:fe::fe]/dns-query
+  - https://1.1.1.2/dns-query
+  - https://1.0.0.2/dns-query

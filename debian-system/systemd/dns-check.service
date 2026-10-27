@@ -1,0 +1,11 @@
+[Unit]
+Description=DNS Sentinel — Monitoraggio proattivo, auto-healing e aggiornamenti
+After=network-online.target pihole-FTL.service dnsproxy.service
+Requires=pihole-FTL.service dnsproxy.service
+  
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/dns-sentinel.sh --cron
+User=root
+StandardOutput=journal
+StandardError=journal
