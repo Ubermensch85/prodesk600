@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily System Maintenance & Automated Upgrade (Debian, Pi-hole, dnsproxy, Tailscale)
+After=network-online.target pihole-FTL.service dnsproxy.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/daily-system-maintenance.sh
+User=root
+StandardOutput=journal
+StandardError=journal

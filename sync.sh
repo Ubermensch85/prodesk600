@@ -14,6 +14,8 @@ echo "[+] Copia configurazioni di sistema..."
 cp /etc/systemd/system/dnsproxy.service "$REPO_DIR/debian-system/systemd/" 2>/dev/null || true
 cp /etc/systemd/system/dns-check.service "$REPO_DIR/debian-system/systemd/" 2>/dev/null || true
 cp /etc/systemd/system/dns-check.timer "$REPO_DIR/debian-system/systemd/" 2>/dev/null || true
+cp /etc/systemd/system/daily-system-maintenance.service "$REPO_DIR/debian-system/systemd/" 2>/dev/null || true
+cp /etc/systemd/system/daily-system-maintenance.timer "$REPO_DIR/debian-system/systemd/" 2>/dev/null || true
 cp /etc/dhcpcd.conf "$REPO_DIR/debian-system/network/" 2>/dev/null || true
 sudo ufw status verbose > "$REPO_DIR/debian-system/ufw/ufw-status.txt" 2>/dev/null || true
 cp /home/ubermensch/ufw-setup.sh "$REPO_DIR/debian-system/ufw/" 2>/dev/null || true

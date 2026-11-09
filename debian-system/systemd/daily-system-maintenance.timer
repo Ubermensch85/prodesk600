@@ -1,0 +1,11 @@
+[Unit]
+Description=Timer per manutenzione e aggiornamento autonomo giornaliero
+Requires=daily-system-maintenance.service
+
+[Timer]
+OnCalendar=*-*-* 04:00:00
+RandomizedDelaySec=5m
+Persistent=true
+
+[Install]
+WantedBy=timers.target
