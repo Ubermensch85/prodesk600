@@ -48,6 +48,12 @@ if [[ -f /usr/local/bin/dns-report-telegram.sh ]]; then
       /usr/local/bin/dns-report-telegram.sh > "$REPO_DIR/dns-network/scripts/dns-report-telegram.sh"
 fi
 
+if [[ -f /usr/local/bin/daily-system-maintenance.sh ]]; then
+  sed -e 's/BOT_TOKEN=".*"/BOT_TOKEN="${TELEGRAM_BOT_TOKEN:-YOUR_BOT_TOKEN}"/' \
+      -e 's/CHAT_ID=".*"/CHAT_ID="${TELEGRAM_CHAT_ID:-YOUR_CHAT_ID}"/' \
+      /usr/local/bin/daily-system-maintenance.sh > "$REPO_DIR/dns-network/scripts/daily-system-maintenance.sh"
+fi
+
 # 3. Multimedia Stack
 echo "[+] Copia configurazioni multimedia (Samba, Transmission, Plex)..."
 cp /etc/samba/smb.conf "$REPO_DIR/multimedia/samba/" 2>/dev/null || true
