@@ -28,15 +28,20 @@ check_updates() {
   # pihole
   PIHOLE_VERSIONS=$(pihole -v 2>/dev/null)
   PIHOLE_UPDATE=0
-  if echo "$PIHOLE_VERSIONS" | grep -qi "update available"; then
-    PIHOLE_UPDATE=1
-  fi
+  while read -r line; do
+    cur=$(echo "$line" | grep -oP 'version is \K[^ ]+' || true)
+    lat=$(echo "$line" | grep -oP '\(Latest: \K[^)]+' || true)
+    if [[ -n "$cur" && -n "$lat" && "$cur" != "$lat" && "$lat" != "ERROR" ]]; then
+      PIHOLE_UPDATE=1
+    fi
+  done <<< "$PIHOLE_VERSIONS"
+  PIHOLE_SUMMARY=$(echo "$PIHOLE_VERSIONS" | awk '/version is/{printf "%s %s, ", $1, $4}' | sed 's/, $//')
 
   # tailscale
   INSTALLED_TAILSCALE=$(tailscale version 2>/dev/null | head -n1)
 
   # debian packages
-  DEBIAN_UPDATES=$(apt-get -s upgrade 2>/dev/null | grep -oP '^\d+(?=\s+aggiornati)' || echo "0")
+  DEBIAN_UPDATES=$(apt-get -s upgrade 2>/dev/null | grep -oP '^\d+(?=\s+(aggiornat[oi]|upgraded))' || echo "0")
   REBOOT_REQUIRED=0
   [[ -f /var/run/reboot-required ]] && REBOOT_REQUIRED=1
 }
@@ -117,7 +122,7 @@ elif [[ "$ACTION" == "--report" ]] || [[ $(date +%u) -eq 7 && $(date +%H) -eq 20
 
 📦 Stato Software & Sistema:
 • Debian 13: ${DEBIAN_UPDATES:-0} aggiornamenti pendenti (unattended-upgrades attivo)
-• Pi-hole: v6 (FTL v6.8, Core v6.5, Web v6.6.1)
+• Pi-hole: v6 (${PIHOLE_SUMMARY:-attivo})
 • dnsproxy: ${INSTALLED_DNSPROXY:-v0.86.0} (DoQ/DoH3 in parallel)
 • Tailscale: ${INSTALLED_TAILSCALE:-1.104.2} (Subnet Router/Exit Node)
 

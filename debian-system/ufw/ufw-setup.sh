@@ -14,8 +14,8 @@
 #    - SSH              (:22)
 #    - Samba SMB3       (:445)
 #    - Plex             (:32400)
-#    - Transmission     (web UI :9091, BitTorrent :51413)
-#    - Tailscale        (UDP :41641)
+#    - Transmission     (web UI :9091, BitTorrent :25413 nel range MAP-E Iliad)
+#    - Tailscale        (UDP :31641 nel range MAP-E Iliad)
 # =============================================================================
 
 set -euo pipefail
@@ -75,10 +75,10 @@ echo "      [OK] Loopback lo (Interno)"
 ufw allow out 853/udp comment "Allow Quad9 DoQ Outgoing" > /dev/null
 echo "      [OK] DoQ Outgoing UDP 853"
 
-# TAILSCALE — UDP 41641
-ufw allow in on eno1 to any port 41641 proto udp \
+# TAILSCALE — UDP 31641 (nel range porte IPv4 MAP-E Iliad 24576-32767)
+ufw allow in on eno1 to any port 31641 proto udp \
     comment "Tailscale WireGuard handshake" > /dev/null
-echo "      [OK] Tailscale UDP 41641"
+echo "      [OK] Tailscale UDP 31641"
 
 # SSH — TCP 22
 ufw allow in on eno1 from 192.168.1.0/24 to any port 22 proto tcp \
@@ -116,12 +116,14 @@ ufw allow in on tailscale0 to any port 445 proto tcp \
     comment "Samba SMB3 da Tailscale" > /dev/null
 echo "      [OK] Samba TCP 445 (LAN + Tailscale)"
 
-# PLEX — TCP 32400
+# PLEX — TCP 32400 (LAN, WAN Port-Forwarding e Tailscale)
 ufw allow in on eno1 from 192.168.1.0/24 to any port 32400 proto tcp \
     comment "Plex da LAN" > /dev/null
+ufw allow in on eno1 to any port 32400 proto tcp \
+    comment "Plex Remote Access WAN/LAN" > /dev/null
 ufw allow in on tailscale0 to any port 32400 proto tcp \
     comment "Plex da Tailscale" > /dev/null
-echo "      [OK] Plex TCP 32400 (LAN + Tailscale)"
+echo "      [OK] Plex TCP 32400 (LAN + WAN + Tailscale)"
 
 # TRANSMISSION Web UI — TCP 9091
 ufw allow in on eno1 from 192.168.1.0/24 to any port 9091 proto tcp \
@@ -130,12 +132,12 @@ ufw allow in on tailscale0 to any port 9091 proto tcp \
     comment "Transmission Web UI da Tailscale" > /dev/null
 echo "      [OK] Transmission Web UI TCP 9091 (LAN + Tailscale)"
 
-# TRANSMISSION BitTorrent — TCP+UDP 51413
-ufw allow in on eno1 to any port 51413 proto tcp \
-    comment "Transmission BitTorrent TCP IPv4" > /dev/null
-ufw allow in on eno1 to any port 51413 proto udp \
-    comment "Transmission BitTorrent UDP IPv4" > /dev/null
-echo "      [OK] Transmission BitTorrent TCP+UDP 51413 (IPv4)"
+# TRANSMISSION BitTorrent — TCP+UDP 25413 (nel range porte IPv4 MAP-E Iliad 24576-32767)
+ufw allow in on eno1 to any port 25413 proto tcp \
+    comment "Transmission BitTorrent TCP" > /dev/null
+ufw allow in on eno1 to any port 25413 proto udp \
+    comment "Transmission BitTorrent UDP" > /dev/null
+echo "      [OK] Transmission BitTorrent TCP+UDP 25413 (IPv4 + IPv6)"
 
 # =============================================================================
 #  STEP 6 — Attivazione

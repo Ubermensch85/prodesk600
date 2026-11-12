@@ -1,7 +1,7 @@
-# Pi-hole configuration file (v6.8)
+# Pi-hole configuration file (v6.9)
 # Encoding: UTF-8
 # This file is managed by pihole-FTL
-# Last updated on 2026-10-27 12:00:40 CET
+# Last updated on 2026-11-12 15:32:25 CET
 
 [dns]
   # Upstream DNS Servers to be used by Pi-hole. If this is not set, Pi-hole will not
@@ -131,7 +131,17 @@
   # Allowed values are:
   #     Array of custom DNS records each one in HOSTS form: "IP HOSTNAME [HOSTNAME ...]"
   hosts = [
-    "192.168.1.254 iliadbox.home iliadbox"
+    "192.168.1.254 iliadbox.home iliadbox",
+    "fe80::3a07:16ff:fe1e:d77b iliadbox.home iliadbox",
+    "192.168.1.118 prodesk600.home prodesk600 pi.hole",
+    "2a01:e11:2009:d1d0::118 prodesk600.home prodesk600 pi.hole",
+    "fd00::118 prodesk600.home prodesk600 pi.hole",
+    "192.168.1.115 blackarchmbp.home blackarchmbp",
+    "192.168.1.116 thinkpad-franco.home thinkpad-franco",
+    "192.168.1.117 iphone-15-plus.home iphone-15-plus",
+    "192.168.1.119 hisense-tv.home hisense-tv",
+    "192.168.1.123 iphone-francesco.home iphone-francesco iphone.home",
+    "192.168.1.134 nanetta.home nanetta"
   ] ### CHANGED, default = []
 
   # If set, queries for plain names, without dots or domain parts, are never forwarded to
@@ -886,7 +896,8 @@
   # IP address. If this value is not set (empty string), all accesses are allowed.
   # Otherwise, the default setting is to deny all accesses. On each request the full
   # list is traversed, and the last (!) match wins. IPv6 addresses may be specified in
-  # CIDR-form [a:b::c]/64.
+  # CIDR-form [a:b::c]/64. IPv4 clients are matched as IPv4 also on a dual-stack port
+  # ("+80"), and [::ffff:a.b.c.d] is the same entry as a.b.c.d.
   #
   # Example 1: "+127.0.0.1,+[::1]" ---> deny all access, except from 127.0.0.1 and ::1
   #
@@ -1448,8 +1459,9 @@
   #     Array of valid dnsmasq config line options
   dnsmasq_lines = [
     "server=/ts.net/100.100.100.100",
-    "local=/lan/",
-    "rebind-domain-ok=/plex.direct/"
+    "rebind-domain-ok=/plex.direct/",
+    "rebind-domain-ok=/ts.net/",
+    "rebind-domain-ok=/home/"
   ] ### CHANGED, default = []
 
   # Log additional information about queries and replies to pihole.log
@@ -1492,7 +1504,8 @@
   # By default, FTL reports warnings coming from the embedded dnsmasq DNS server to the
   # FTL log file. These warnings can be useful to identify misconfigurations or problems
   # with the DNS server. However, some warnings may be harmless and can be ignored in
-  # certain setups. Enabling this setting will hide all dnsmasq warnings.
+  # certain setups. Enabling this setting hides them in the FTL log file, the dnsmasq
+  # log is left untouched.
   #
   # Allowed values are:
   #     true or false
@@ -1504,8 +1517,8 @@
   # closed by remote server) to the FTL log file. These warnings can be useful to
   # identify intermittent network problems or general problem with upstream servers.
   # However, in some setups, these warnings may be expected (e.g. due to low-quality
-  # Internet connectivity) and cannot be fixed. Enabling this setting will hide all
-  # connection warnings.
+  # Internet connectivity) and cannot be fixed. Enabling this setting hides them in the
+  # FTL log file, the dnsmasq log is left untouched.
   #
   # Allowed values are:
   #     true or false

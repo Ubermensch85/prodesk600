@@ -6,7 +6,6 @@ New profiles: skip
 To                         Action      From
 --                         ------      ----
 Anywhere on lo             ALLOW IN    Anywhere                   # Consenti traffico interno (DNS loopback)
-41641/udp on eno1          ALLOW IN    Anywhere                   # Tailscale WireGuard handshake
 22/tcp on eno1             ALLOW IN    192.168.1.0/24             # SSH da LAN
 22/tcp on tailscale0       ALLOW IN    Anywhere                   # SSH da Tailscale
 53/udp on eno1             ALLOW IN    192.168.1.0/24             # Pi-hole DNS UDP da LAN
@@ -23,8 +22,6 @@ Anywhere on lo             ALLOW IN    Anywhere                   # Consenti tra
 32400/tcp on tailscale0    ALLOW IN    Anywhere                   # Plex da Tailscale
 9091/tcp on eno1           ALLOW IN    192.168.1.0/24             # Transmission Web UI da LAN
 9091/tcp on tailscale0     ALLOW IN    Anywhere                   # Transmission Web UI da Tailscale
-51413/tcp on eno1          ALLOW IN    Anywhere                   # Transmission BitTorrent TCP IPv6
-51413/udp on eno1          ALLOW IN    Anywhere                   # Transmission BitTorrent UDP IPv6
 32410:32415/udp on eno1    ALLOW IN    192.168.1.0/24             # Plex GDM discovery da LAN
 32400/tcp on eno1          ALLOW IN    Anywhere                   # Plex Remote Access WAN/LAN
 31641/udp on eno1          ALLOW IN    Anywhere                   # Tailscale WireGuard handshake
@@ -39,7 +36,6 @@ Anywhere (v6) on lo        ALLOW IN    Anywhere (v6)              # Consenti tra
 445/tcp (v6) on tailscale0 ALLOW IN    Anywhere (v6)              # Samba SMB3 da Tailscale
 32400/tcp (v6) on tailscale0 ALLOW IN    Anywhere (v6)              # Plex da Tailscale
 9091/tcp (v6) on tailscale0 ALLOW IN    Anywhere (v6)              # Transmission Web UI da Tailscale
-41641/udp (v6) on eno1     ALLOW IN    Anywhere (v6)              # Tailscale WireGuard handshake
 53 on eno1                 ALLOW IN    fd00::/64                  # Pi-hole DNS da LAN ULA
 53 on eno1                 ALLOW IN    2a01:e11:2009:d1d0::/64    # Pi-hole DNS da LAN GUA
 53 on eno1                 ALLOW IN    fe80::/10                  # Pi-hole DNS da Link-Local
@@ -55,8 +51,6 @@ Anywhere (v6) on lo        ALLOW IN    Anywhere (v6)              # Consenti tra
 32400/tcp on eno1          ALLOW IN    2a01:e11:2009:d1d0::/64    # Plex da LAN GUA
 9091/tcp on eno1           ALLOW IN    fd00::/64                  # Transmission Web UI da LAN ULA
 9091/tcp on eno1           ALLOW IN    2a01:e11:2009:d1d0::/64    # Transmission Web UI da LAN GUA
-51413/tcp (v6) on eno1     ALLOW IN    Anywhere (v6)              # Transmission BitTorrent TCP IPv6
-51413/udp (v6) on eno1     ALLOW IN    Anywhere (v6)              # Transmission BitTorrent UDP IPv6
 32410:32415/udp on eno1    ALLOW IN    2a01:e11:2009:d1d0::/64    # Plex GDM discovery IPv6 GUA da LAN
 32410:32415/udp on eno1    ALLOW IN    fd00::/64                  # Plex GDM discovery IPv6 ULA da LAN
 32400/tcp (v6) on eno1     ALLOW IN    Anywhere (v6)              # Plex Remote Access WAN/LAN

@@ -27,7 +27,7 @@ ERRORS=()
 # 1. Aggiornamento Debian, Kernel, librerie e repo APT (Tailscale, Plex, Google Cloud SDK, ecc.)
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -y > /dev/null 2>&1
-UPGRADABLE=$(apt-get -s upgrade 2>/dev/null | grep -oP '^\d+(?=\s+aggiornati)' || echo "0")
+UPGRADABLE=$(apt-get -s upgrade 2>/dev/null | grep -oP '^\d+(?=\s+(aggiornat[oi]|upgraded))' || echo "0")
 if [[ "${UPGRADABLE:-0}" -gt 0 ]]; then
   if apt-get dist-upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" > /dev/null 2>&1; then
     UPDATED_ITEMS+=("Debian & APT: ${UPGRADABLE} pacchetti aggiornati")
@@ -40,7 +40,15 @@ fi
 
 # 2. Aggiornamento Pi-hole v6
 PIHOLE_BEFORE=$(pihole -v 2>/dev/null)
-if echo "$PIHOLE_BEFORE" | grep -qi "update available"; then
+PIHOLE_NEEDS_UP=0
+while read -r line; do
+  cur=$(echo "$line" | grep -oP 'version is \K[^ ]+' || true)
+  lat=$(echo "$line" | grep -oP '\(Latest: \K[^)]+' || true)
+  if [[ -n "$cur" && -n "$lat" && "$cur" != "$lat" && "$lat" != "ERROR" ]]; then
+    PIHOLE_NEEDS_UP=1
+  fi
+done <<< "$PIHOLE_BEFORE"
+if [[ $PIHOLE_NEEDS_UP -eq 1 ]]; then
   if pihole -up > /dev/null 2>&1; then
     UPDATED_ITEMS+=("Pi-hole v6 aggiornato con successo")
   else
