@@ -27,6 +27,8 @@ Anywhere on lo             ALLOW IN    Anywhere                   # Consenti tra
 31641/udp on eno1          ALLOW IN    Anywhere                   # Tailscale WireGuard handshake
 25413/tcp on eno1          ALLOW IN    Anywhere                   # Transmission BitTorrent TCP
 25413/udp on eno1          ALLOW IN    Anywhere                   # Transmission BitTorrent UDP
+5354/udp on eno1           ALLOW IN    192.168.1.119              # DNS IPv4-only Hisense TV UDP
+5354/tcp on eno1           ALLOW IN    192.168.1.119              # DNS IPv4-only Hisense TV TCP
 Anywhere (v6) on lo        ALLOW IN    Anywhere (v6)              # Consenti traffico interno (DNS loopback)
 22/tcp (v6) on tailscale0  ALLOW IN    Anywhere (v6)              # SSH da Tailscale
 53/udp (v6) on tailscale0  ALLOW IN    Anywhere (v6)              # Pi-hole DNS UDP da Tailscale
