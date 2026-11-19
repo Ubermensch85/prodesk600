@@ -12,6 +12,7 @@ echo "=== Sincronizzazione configurazioni HP ProDesk 600 ==="
 # 1. Debian & Systemd
 echo "[+] Copia configurazioni di sistema..."
 cp /etc/systemd/system/dnsproxy.service "$REPO_DIR/debian-system/systemd/" 2>/dev/null || true
+cp /etc/systemd/system/dnsproxy-tv.service "$REPO_DIR/debian-system/systemd/" 2>/dev/null || true
 cp /etc/systemd/system/dns-check.service "$REPO_DIR/debian-system/systemd/" 2>/dev/null || true
 cp /etc/systemd/system/dns-check.timer "$REPO_DIR/debian-system/systemd/" 2>/dev/null || true
 cp /etc/systemd/system/daily-system-maintenance.service "$REPO_DIR/debian-system/systemd/" 2>/dev/null || true
@@ -19,6 +20,7 @@ cp /etc/systemd/system/daily-system-maintenance.timer "$REPO_DIR/debian-system/s
 cp /etc/dhcpcd.conf "$REPO_DIR/debian-system/network/" 2>/dev/null || true
 sudo ufw status verbose > "$REPO_DIR/debian-system/ufw/ufw-status.txt" 2>/dev/null || true
 cp /home/ubermensch/ufw-setup.sh "$REPO_DIR/debian-system/ufw/" 2>/dev/null || true
+sudo cat /etc/ufw/before.rules > "$REPO_DIR/debian-system/ufw/before.rules" 2>/dev/null || true
 
 # 2. DNS & Network
 echo "[+] Copia stack DNS & dnsproxy..."
