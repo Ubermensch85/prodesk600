@@ -13,6 +13,7 @@ echo "=== Sincronizzazione configurazioni HP ProDesk 600 ==="
 echo "[+] Copia configurazioni di sistema..."
 cp /etc/systemd/system/dnsproxy.service "$REPO_DIR/debian-system/systemd/" 2>/dev/null || true
 cp /etc/systemd/system/dnsproxy-tv.service "$REPO_DIR/debian-system/systemd/" 2>/dev/null || true
+cp /etc/systemd/system/pihole-FTL.service.d/override.conf "$REPO_DIR/debian-system/systemd/pihole-FTL-override.conf" 2>/dev/null || true
 cp /etc/systemd/system/dns-check.service "$REPO_DIR/debian-system/systemd/" 2>/dev/null || true
 cp /etc/systemd/system/dns-check.timer "$REPO_DIR/debian-system/systemd/" 2>/dev/null || true
 cp /etc/systemd/system/daily-system-maintenance.service "$REPO_DIR/debian-system/systemd/" 2>/dev/null || true
