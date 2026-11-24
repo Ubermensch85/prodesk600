@@ -1,7 +1,7 @@
 # Pi-hole configuration file (v6.9)
 # Encoding: UTF-8
 # This file is managed by pihole-FTL
-# Last updated on 2026-11-12 15:32:25 CET
+# Last updated on 2026-11-24 22:18:44 CET
 
 [dns]
   # Upstream DNS Servers to be used by Pi-hole. If this is not set, Pi-hole will not
@@ -136,12 +136,12 @@
     "192.168.1.118 prodesk600.home prodesk600 pi.hole",
     "2a01:e11:2009:d1d0::118 prodesk600.home prodesk600 pi.hole",
     "fd00::118 prodesk600.home prodesk600 pi.hole",
-    "192.168.1.115 blackarchmbp.home blackarchmbp",
-    "192.168.1.116 thinkpad-franco.home thinkpad-franco",
-    "192.168.1.117 iphone-15-plus.home iphone-15-plus",
+    "192.168.1.115 macbook-a1708.home macbook-a1708",
+    "192.168.1.116 thinkpad-x280.home thinkpad-x280",
     "192.168.1.119 hisense-tv.home hisense-tv",
-    "192.168.1.123 iphone-francesco.home iphone-francesco iphone.home",
-    "192.168.1.134 nanetta.home nanetta"
+    "192.168.1.123 iphone-15-plus.home iphone-15-plus",
+    "192.168.1.33 iphone-6s.home iphone-6s",
+    "192.168.1.134 android-mariachiara.home android-mariachiara"
   ] ### CHANGED, default = []
 
   # If set, queries for plain names, without dots or domain parts, are never forwarded to
