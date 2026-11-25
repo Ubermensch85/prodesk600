@@ -19,6 +19,8 @@ cp /etc/systemd/system/dns-check.timer "$REPO_DIR/debian-system/systemd/" 2>/dev
 cp /etc/systemd/system/daily-system-maintenance.service "$REPO_DIR/debian-system/systemd/" 2>/dev/null || true
 cp /etc/systemd/system/daily-system-maintenance.timer "$REPO_DIR/debian-system/systemd/" 2>/dev/null || true
 cp /etc/dhcpcd.conf "$REPO_DIR/debian-system/network/" 2>/dev/null || true
+mkdir -p "$REPO_DIR/debian-system/chrony"
+cp /etc/chrony/conf.d/99-nts.conf "$REPO_DIR/debian-system/chrony/" 2>/dev/null || true
 sudo ufw status verbose > "$REPO_DIR/debian-system/ufw/ufw-status.txt" 2>/dev/null || true
 cp /home/ubermensch/ufw-setup.sh "$REPO_DIR/debian-system/ufw/" 2>/dev/null || true
 sudo cat /etc/ufw/before.rules > "$REPO_DIR/debian-system/ufw/before.rules" 2>/dev/null || true
