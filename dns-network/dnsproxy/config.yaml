@@ -34,14 +34,14 @@ ratelimit: 1000
 # Explicit bootstrap resolvers (independent of local 127.0.0.1)
 bootstrap:
   - 9.9.9.9
-  - 149.112.112.9
+  - 149.112.112.112
   - 1.1.1.2
   - 1.0.0.2
 
 # Upstream Resolvers (Dual-provider: Quad9 DoQ + Cloudflare 1.1.1.2 Security DoH3)
 upstream:
   - quic://9.9.9.9:853
-  - quic://149.112.112.9:853
+  - quic://149.112.112.112:853
   - quic://[2620:fe::fe]:853
   - quic://[2620:fe::9]:853
   - https://1.1.1.2/dns-query
@@ -52,7 +52,7 @@ upstream:
 # Emergency Fallback Resolvers
 fallback:
   - https://9.9.9.9/dns-query
-  - https://149.112.112.9/dns-query
+  - https://149.112.112.112/dns-query
   - https://[2620:fe::fe]/dns-query
   - https://1.1.1.2/dns-query
   - https://1.0.0.2/dns-query
